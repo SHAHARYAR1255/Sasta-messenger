@@ -1,0 +1,29 @@
+.App{
+    text-align : center;
+}
+.heading{
+    color:blue;
+    background-color: cornsilk;
+    text-decoration-line: underline;
+    font-style: italic;
+}
+.form{
+    padding : 20px ;
+    margin : 20px ;
+    z-index : 1 ;
+    bottom: 0; 
+    position: fixed;
+    width : 100% ;
+    background-color: thistle;
+}
+.input{
+    flex : 1 ;
+}
+.send{
+    flex : 0 ;
+}
+
+.formControl{
+    flex-direction: row !important; /* to overwrite prop */
+    display: flex !important;
+}

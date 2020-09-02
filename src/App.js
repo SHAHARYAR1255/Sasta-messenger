@@ -1,49 +1,54 @@
-import React, {useState, useEffect} from 'react';
-import { Button } from '@material-ui/core';
-import db from './firebase';
+import React , {useState, useEffect} from 'react';
+import Message from './components/Message';
 import firebase from 'firebase';
-import Refsdemo from './components/Refsdemo';
+import db from './firebase';
+import { Input, FormControl } from '@material-ui/core';
+import  FlipMove  from 'react-flip-move';
+import './App.css';
+import SendIcon from '@material-ui/icons/Send';
+import { IconButton } from '@material-ui/core';
 
-const App = () =>{
-  const [todos , setTodos ] = useState([]);
-  const [input , setInput ] = useState('');
-  
-  useEffect(() =>{
-    db.collection('todos').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-      setTodos(snapshot.docs.map(doc => ({id:doc.id , todo:doc.data().todo})))})
+function App() {
+  const [input, setinput] = useState('');
+  const [messages, setmessages] = useState([]);
+  const [username, setusername] = useState('');
+
+  useEffect(()=>{  // will tirggered when app component loads //
+    db.collection('messages').orderBy('timestamp' , 'desc').onSnapshot(snapshot => {
+      setmessages(snapshot.docs.map(doc => ({id:doc.id , message: doc.data()})
+      ))})
   }, [])
 
-  const addTodo =(e) =>{
+  useEffect(() => {
+    setusername(prompt('Type Your Name?'));
+  }, [])
+
+  const handle = (e) =>{
     e.preventDefault();
-    setTodos([...todos , input]);
-    db.collection('todos').add({
-      todo : input,
+    db.collection('messages').add({
+      username , 
+      text: input,
       timestamp : firebase.firestore.FieldValue.serverTimestamp()
-    })
-    setInput('');
-   // addToDatabase(input);
-  };
-
-
-//  const addToDatabase = (value) =>{
-//    db.ref('todos/').set({todo :value});
-//  }
-
-  return(
-    <div className='mx-auto' style={{width:'400px'}}>
-      <h1> TOdO's To DO </h1>
-      <form>
-        <input type='text' value={input} onChange={(e)=> setInput(e.target.value)} />
-        <Button type="submit"  disabled={!input} onClick={addTodo} variant="contained" color="primary" disableElevation>Add Todo</Button>
+    });
+    setinput('')
+  }
+  return (
+    <div className='App'>
+      <h2 className="heading">Sasta Messenger</h2>
+      <p>Recent Message comes at the top</p>
+      <form className="form">
+        <FormControl className="formControl">
+        <Input className='input' placeholder='Enter a message...' value={input} onChange={e => setinput(e.target.value)} />
+        <IconButton className='send' disabled={!input} onClick={handle}type='submit'>Send<SendIcon /></IconButton>
+        </FormControl>
       </form>
-      <ul>
-        {todos.map(todo =>{
-          return <Refsdemo todo={todo.todo} id={todo.id} />
-        })}
-      </ul>
+      <FlipMove>
+      {messages.map(({id , message}) =>{
+        return <Message key = {id} message={message} username={username}/>
+      })}
+      </FlipMove>
     </div>
-  );
+  )
 }
-
 
 export default App;
